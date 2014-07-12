@@ -10,10 +10,14 @@ package Ballerina;
 
 use Carp;
 use File::Spec;
+use File::Copy;
+use File::Temp 'tempfile';
 use IO::Prompt;
 use YAML::Tiny;
 use DBIx::Class::Schema::Loader qw/make_schema_at/;
 use File::Path qw(remove_tree make_path);
+use Dancer2::CLI::Command::gen 0.143000;
+use LWP::Simple;
 
 sub new($class, %config) {
 	my $self = bless { conf => \%config }, $class;
@@ -33,9 +37,11 @@ sub conf($self, $param) {
 sub _init_folder($self) {
 	my $root = $self->conf('root');
 
-	if (!$self->conf('force') && -d $root) {
-		croak "Not overwriting folder. Bailing out.\n" 
-			unless prompt "Folder $root exists. Overwrite? ", '-tyn1';
+	if (-d $root) {
+		if (!$self->conf('force')) {
+			croak "Not overwriting folder. Bailing out.\n" 
+				unless prompt "Folder $root exists. Overwrite? ", '-tyn1';
+		}
 		remove_tree $root;
 	}
 
@@ -51,6 +57,43 @@ sub compute_dbix_class($self) {
 	make_schema_at $self->conf('name') . "::Schema",
 	               { dump_directory => $lib_folder },
 	               [ $dsn, $self->conf('db-user'), $self->conf('db-password') ]
+}
+
+sub run_dancer2($self) {
+	Dancer2::CLI::Command::gen->execute( {
+   		       path => '',
+   		   no_check => 1,
+  	  	  directory => $self->conf('root'),
+		application => $self->conf('name'),
+  	} );
+}
+
+sub clean_up_dancer2($self) {
+	my @files = qw(
+		public/css/style.css
+		public/images/perldancer-bg.jpg
+		public/images/perldancer.jpg
+		Makefile.PL
+		MANIFEST
+		MANIFEST.SKIP		
+	);
+	for my $f (@files) {
+		my $full_path = File::Spec->catfile($self->conf("root"), $f);
+		unlink $full_path if -f $full_path;
+	}
+}
+
+sub fetch_jquery($self) {
+	my ($fh, $filename) = tempfile();
+	my $ans = getstore("http://code.jquery.com/jquery.min.js", $filename);
+	if (is_success($ans)) {
+		move($filename,
+			 File::Spec->catfile($self->conf("root"),
+			 	                 "public", "javascripts", "jquery.js"));
+	} else {
+		print "Failed to retrieve a recent version of jquery.\n";
+		print "Using Dancer2 default version.\n";
+	}
 }
 
 1;

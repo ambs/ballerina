@@ -7,6 +7,7 @@ use feature 'signatures';
 
 use Getopt::Long;
 use IO::Prompt;
+use Cwd;
 
 use lib 'lib';
 use Ballerina;
@@ -36,8 +37,16 @@ for my $field (keys %required) {
 
 $config{'db-port'} ||= 3306;
 
+unless (File::Spec->file_name_is_absolute($config{root})) {
+	$config{root} = File::Spec->catfile(getcwd, $config{root});
+}
+
 print Dumper(\%config);
 
 my $ballerina = Ballerina->new(%config);
 $ballerina->save();
 $ballerina->compute_dbix_class();
+$ballerina->run_dancer2();
+$ballerina->clean_up_dancer2();
+$ballerina->fetch_jquery();
+
