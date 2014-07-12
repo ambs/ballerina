@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+no warnings 'experimental::signatures';
+use feature 'signatures';
+
+use Getopt::Long;
+use IO::Prompt;
+
+use lib 'lib';
+use Ballerina;
+
+
+use Data::Dumper;
+
+my %required = (
+             'root' => 'Root folder for application',
+             'name' => 'Application name',
+	  	'db-server' => 'Database servername',
+          'db-user' => 'Database username',
+      'db-password' => 'Database user password',
+         'database' => 'Database name',
+	);
+
+my %config = ();
+GetOptions \%config, "force", "db-port=s", map { "$_=s" } keys %required;
+
+
+for my $field (keys %required) {
+	next if defined $config{$field};
+
+	$config{$field} = prompt( $required{$field} . ": ", '-tty', 
+		       $field =~ /password/ ? (-e => '*') : ())->{value};
+}
+
+$config{'db-port'} ||= 3306;
+
+print Dumper(\%config);
+
+my $ballerina = Ballerina->new(%config);
+$ballerina->save();
+$ballerina->compute_dbix_class();
