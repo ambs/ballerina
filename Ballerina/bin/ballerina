@@ -49,4 +49,5 @@ $ballerina->compute_dbix_class();
 $ballerina->run_dancer2();
 $ballerina->clean_up_dancer2();
 $ballerina->fetch_jquery();
+$ballerina->connect_dbix();
 

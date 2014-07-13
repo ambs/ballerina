@@ -34,6 +34,10 @@ sub conf($self, $param) {
 	return $self->{conf}{$param};
 }
 
+sub set_conf($self, $param, $value) {
+	$self->{conf}{$param} = $value;
+}
+
 sub _init_folder($self) {
 	my $root = $self->conf('root');
 
@@ -54,7 +58,10 @@ sub compute_dbix_class($self) {
 	my $dsn = sprintf("DBI:mysql:database=%s;host=%s;port=%s", 
 			   map { $self->conf($_) } qw/database db-server db-port/);
 
-	make_schema_at $self->conf('name') . "::Schema",
+	$self->set_conf(dsn    => $dsn);
+	$self->set_conf(schema => $self->conf('name') . "::Schema");
+
+	make_schema_at $self->conf("schema"),
 	               { dump_directory => $lib_folder },
 	               [ $dsn, $self->conf('db-user'), $self->conf('db-password') ]
 }
@@ -94,6 +101,14 @@ sub fetch_jquery($self) {
 		print "Failed to retrieve a recent version of jquery.\n";
 		print "Using Dancer2 default version.\n";
 	}
+}
+
+sub connect_dbix($self) {
+	my $module_path = File::Spec->catfile($self->conf("root"), "lib");
+	unshift @INC, $module_path;
+	my $schema = $self->conf("schema");
+	eval "require $schema";
+	$self->{schema} = $schema->connect($self->conf("dsn"));
 }
 
 1;
