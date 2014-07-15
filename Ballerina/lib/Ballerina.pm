@@ -12,12 +12,14 @@ use Carp;
 use File::Spec;
 use File::Copy;
 use File::Temp 'tempfile';
+use File::Find;
 use IO::Prompt;
 use YAML::Tiny;
 use DBIx::Class::Schema::Loader qw/make_schema_at/;
 use File::Path qw(remove_tree make_path);
 use Dancer2::CLI::Command::gen 0.143000;
 use LWP::Simple;
+use Template;
 
 sub new($class, %config) {
 	my $self = bless { conf => \%config }, $class;
@@ -109,6 +111,27 @@ sub connect_dbix($self) {
 	my $schema = $self->conf("schema");
 	eval "require $schema";
 	$self->{schema} = $schema->connect($self->conf("dsn"));
+}
+
+sub create_templates($self) {
+	$self->clean_up_dancer2();
+	$self->fetch_jquery();
+
+	my $tt = Template->new() || die "$Template::ERROR\n";
+	my $vars = { appname => $self->conf("name")};
+
+	for my $infile ($self->_find_skel_files()) {
+		### XXX - Fixme => share/skel replaced by the correct folder name
+		my $outfile = $infile =~ s{share/skel}{$self->conf('root')}re;		
+	    $tt->process($infile, $vars, $outfile, binmode => ':utf8');
+	}
+}
+
+sub _find_skel_files($self) {
+	my @files = ();
+	### XXX - Fixme => share replaced by the correct folder name
+	find(sub {-f $_ and push @files, $File::Find::name}, "share");
+	return @files;
 }
 
 1;
