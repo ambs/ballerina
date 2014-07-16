@@ -118,11 +118,17 @@ sub create_templates($self) {
 	$self->fetch_jquery();
 
 	my $tt = Template->new() || die "$Template::ERROR\n";
-	my $vars = { appname => $self->conf("name")};
+	my $vars = {
+					appname => $self->conf("name"),
+					author  => $self->conf("author") || "A. U. Thor",					
+					email   => $self->conf("email")  || 'a.u.thor@cpan.org',
+					year    => (localtime(time))[5] + 1900,
+			   };
 
 	for my $infile ($self->_find_skel_files()) {
 		### XXX - Fixme => share/skel replaced by the correct folder name
-		my $outfile = $infile =~ s{share/skel}{$self->conf('root')}re;		
+		my $outfile = $infile =~ s{share/skel}{$self->conf('root')}re;	
+		$outfile =~ s{_libdir}{"lib/" . join("/", split /::/, $self->conf("name"))}e;
 	    $tt->process($infile, $vars, $outfile, binmode => ':utf8');
 	}
 }

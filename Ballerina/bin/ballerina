@@ -23,9 +23,11 @@ my %required = (
       'db-password' => 'Database user password',
          'database' => 'Database name',
 	);
+my @other = qw(force db-port=s author=s email=s);
+
 
 my %config = ();
-GetOptions \%config, "force", "db-port=s", map { "$_=s" } keys %required;
+GetOptions \%config, "force", @other, map { "$_=s" } keys %required;
 
 
 for my $field (keys %required) {
