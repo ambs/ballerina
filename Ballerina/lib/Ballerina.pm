@@ -92,17 +92,49 @@ sub clean_up_dancer2($self) {
 	}
 }
 
-sub fetch_jquery($self) {
+sub _download_file($self, $url, $target) {
 	my ($fh, $filename) = tempfile();
-	my $ans = getstore("http://code.jquery.com/jquery.min.js", $filename);
+	my $ans = getstore($url, $filename);
 	if (is_success($ans)) {
-		move($filename,
-			 File::Spec->catfile($self->conf("root"),
-			 	                 "public", "javascripts", "jquery.js"));
+		move $filename, $target;
+		return 1;
 	} else {
+		return 0;
+	}
+}
+
+sub fetch_jquery($self) {
+	my $target = File::Spec->catfile($self->conf("root"),
+	 	                 "public", "javascripts", "jquery.js");
+	if (!$self->_download_file("http://code.jquery.com/jquery.min.js" => $target)) {
 		print "Failed to retrieve a recent version of jquery.\n";
 		print "Using Dancer2 default version.\n";
 	}
+}
+
+sub fetch_bootstrap($self) {
+	my $target = File::Spec->catfile($self->conf("root"),
+	 	                 "public", "javascripts", "bootstrap.js");
+	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" => $target)) {
+		print "Failed to retrieve a recent version of bootstrap.js.\n";
+		print "Using our own version.\n";		
+	}
+
+	$target = File::Spec->catfile($self->conf("root"),
+	 	                 "public", "css", "bootstrap.js");
+	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" => $target)) {
+		print "Failed to retrieve a recent version of bootstrap.css.\n";
+		print "Using our own version.\n";		
+	}
+
+	$target = File::Spec->catfile($self->conf("root"),
+	 	                 "public", "css", "bootstrap-theme.css");
+	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" => $target)) {
+		print "Failed to retrieve a recent version of bootstrap-theme.js.\n";
+		print "Using our own version.\n";		
+	}
+
+
 }
 
 sub connect_dbix($self) {
@@ -114,8 +146,8 @@ sub connect_dbix($self) {
 }
 
 sub create_templates($self) {
-	$self->clean_up_dancer2();
-	$self->fetch_jquery();
+
+	$self->clean_up_dancer2;
 
 	my $tt = Template->new() || die "$Template::ERROR\n";
 	my $vars = {
@@ -134,6 +166,9 @@ sub create_templates($self) {
 		$outfile =~ s{_libdir}{"lib/" . join("/", split /::/, $self->conf("name"))}e;
 	    $tt->process($infile, $vars, $outfile, binmode => ':utf8');
 	}
+
+	$self->fetch_jquery;
+	$self->fetch_bootstrap;
 }
 
 sub _find_skel_files($self) {
