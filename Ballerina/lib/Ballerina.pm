@@ -132,7 +132,7 @@ sub log($self, @msg) {
 }
 
 sub create_templates($self) {
-	$self->log("Generating extra skeleton files.1")
+	$self->log("Generating extra skeleton files.");
 
 	$self->clean_up_dancer2;
 
