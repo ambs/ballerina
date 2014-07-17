@@ -1,0 +1,24 @@
+
+/* Ballerina default CSS */
+
+#content {
+	/* some margins */
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+#footer {
+	text-align: center;
+}
+
+
+/* Fix issue when content gets behind navbar */
+body {
+  padding-top: 60px;
+}
+
+@media (max-width: 979px) {
+  body {
+    padding-top: 0px;
+  }
+}
