@@ -122,6 +122,9 @@ sub create_templates($self) {
 					appname => $self->conf("name"),
 					author  => $self->conf("author") || "A. U. Thor",					
 					email   => $self->conf("email")  || 'a.u.thor@cpan.org',
+					db_user => $self->conf("db-user"),
+					db_pass => $self->conf("db-password"),
+					dsn     => $self->conf("dsn"),
 					year    => (localtime(time))[5] + 1900,
 			   };
 

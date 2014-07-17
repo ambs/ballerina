@@ -26,4 +26,13 @@ engines:
     template_toolkit:
       start_tag: '<%'
       end_tag:   '%>'
-
+plugins:
+  DBIC:
+    default:
+      schema_class: [% appname %]::Schema
+      dsn: [% dsn %]
+      options:
+        RaiseError: 1
+        PrintError: 1
+[% IF db_user %]      user: [% db_user %][% END %]
+[% IF db_pass %]      pass: [% db_pass %][% END %]
