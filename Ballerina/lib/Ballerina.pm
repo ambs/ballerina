@@ -40,22 +40,10 @@ sub set_conf($self, $param, $value) {
 	$self->{conf}{$param} = $value;
 }
 
-sub _init_folder($self) {
-	my $root = $self->conf('root');
-
-	if (-d $root) {
-		if (!$self->conf('force')) {
-			croak "Not overwriting folder. Bailing out.\n" 
-				unless prompt "Folder $root exists. Overwrite? ", '-tyn1';
-		}
-		remove_tree $root;
-	}
-
-	make_path $root;
-}
-
 
 sub compute_dbix_class($self) {
+	$self->log("Generating DBIx::Class schema.");
+
 	my $lib_folder = File::Spec->catfile($self->conf('root'), "lib");
 	my $dsn = sprintf("DBI:mysql:database=%s;host=%s;port=%s", 
 			   map { $self->conf($_) } qw/database db-server db-port/);
@@ -69,6 +57,8 @@ sub compute_dbix_class($self) {
 }
 
 sub run_dancer2($self) {
+	$self->log("Generating Dancer2 skeleton.");
+
 	Dancer2::CLI::Command::gen->execute( {
    		       path => '',
    		   no_check => 1,
@@ -91,19 +81,9 @@ sub clean_up_dancer2($self) {
 		unlink $full_path if -f $full_path;
 	}
 }
-
-sub _download_file($self, $url, $target) {
-	my ($fh, $filename) = tempfile();
-	my $ans = getstore($url, $filename);
-	if (is_success($ans)) {
-		move $filename, $target;
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
 sub fetch_jquery($self) {
+	$self->log("Trying to fetch a recent jquery.js version");
+
 	my $target = File::Spec->catfile($self->conf("root"),
 	 	                 "public", "javascripts", "jquery.js");
 	if (!$self->_download_file("http://code.jquery.com/jquery.min.js" => $target)) {
@@ -113,6 +93,8 @@ sub fetch_jquery($self) {
 }
 
 sub fetch_bootstrap($self) {
+	$self->log("Trying to fetch a recent bootstrap version");
+
 	my $target = File::Spec->catfile($self->conf("root"),
 	 	                 "public", "javascripts", "bootstrap.js");
 	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" => $target)) {
@@ -133,11 +115,11 @@ sub fetch_bootstrap($self) {
 		print "Failed to retrieve a recent version of bootstrap-theme.js.\n";
 		print "Using our own version.\n";		
 	}
-
-
 }
 
 sub connect_dbix($self) {
+	$self->log("Creating DBIx::Class schema.");
+
 	my $module_path = File::Spec->catfile($self->conf("root"), "lib");
 	unshift @INC, $module_path;
 	my $schema = $self->conf("schema");
@@ -145,7 +127,12 @@ sub connect_dbix($self) {
 	$self->{schema} = $schema->connect($self->conf("dsn"));
 }
 
+sub log($self, @msg) {
+	$self->conf("verbose") && say STDERR @msg;
+}
+
 sub create_templates($self) {
+	$self->log("Generating extra skeleton files.1")
 
 	$self->clean_up_dancer2;
 
@@ -171,11 +158,39 @@ sub create_templates($self) {
 	$self->fetch_bootstrap;
 }
 
+## Auxiliary metods bellow
+
 sub _find_skel_files($self) {
 	my @files = ();
 	### XXX - Fixme => share replaced by the correct folder name
 	find(sub {-f $_ and push @files, $File::Find::name}, "share");
 	return @files;
 }
+
+sub _init_folder($self) {
+	my $root = $self->conf('root');
+
+	if (-d $root) {
+		if (!$self->conf('force')) {
+			croak "Not overwriting folder. Bailing out.\n" 
+				unless prompt "Folder $root exists. Overwrite? ", '-tyn1';
+		}
+		remove_tree $root;
+	}
+
+	make_path $root;
+}
+
+sub _download_file($self, $url, $target) {
+	my ($fh, $filename) = tempfile();
+	my $ans = getstore($url, $filename);
+	if (is_success($ans)) {
+		move $filename, $target;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 
 1;
