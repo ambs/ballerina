@@ -15,10 +15,11 @@ use File::Temp 'tempfile';
 use File::Find;
 use IO::Prompt;
 use YAML::Tiny;
+use File::Basename 'dirname';
 use DBIx::Class::Schema::Loader qw/make_schema_at/;
 use File::Path qw(remove_tree make_path);
 use Dancer2::CLI::Command::gen 0.143000;
-use LWP::Simple;
+use HTTP::Tiny;
 use Template;
 
 sub new($class, %config) {
@@ -103,8 +104,8 @@ sub fetch_bootstrap($self) {
 	}
 
 	$target = File::Spec->catfile($self->conf("root"),
-	 	                 "public", "css", "bootstrap.js");
-	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" => $target)) {
+	 	                 "public", "css", "bootstrap.css");
+	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" => $target)) {
 		print "Failed to retrieve a recent version of bootstrap.css.\n";
 		print "Using our own version.\n";		
 	}
@@ -114,6 +115,17 @@ sub fetch_bootstrap($self) {
 	if (!$self->_download_file("http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" => $target)) {
 		print "Failed to retrieve a recent version of bootstrap-theme.js.\n";
 		print "Using our own version.\n";		
+	}
+
+	my $base = "https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/";
+	my $filebase = "glyphicons-halflings-regular.";
+	for my $ext (qw.eot svg ttf woff.) {
+		$target = File::Spec->catfile($self->conf("root"),
+		 	                 "public", "fonts", $filebase.$ext);
+		if (!$self->_download_file($base.$filebase.$ext => $target)) {
+			print "Failed to retrieve a recent version of $filebase$ext.\n";
+			print "Using our own version.\n";		
+		}
 	}
 }
 
@@ -144,6 +156,7 @@ sub create_templates($self) {
 					db_user => $self->conf("db-user"),
 					db_pass => $self->conf("db-password"),
 					dsn     => $self->conf("dsn"),
+					tables  => $self->_table_data,
 					year    => (localtime(time))[5] + 1900,
 			   };
 
@@ -151,14 +164,59 @@ sub create_templates($self) {
 		### XXX - Fixme => share/skel replaced by the correct folder name
 		my $outfile = $infile =~ s{share/skel}{$self->conf('root')}re;	
 		$outfile =~ s{_libdir}{"lib/" . join("/", split /::/, $self->conf("name"))}e;
-	    $tt->process($infile, $vars, $outfile, binmode => ':utf8');
+
+		if (-T $infile) {
+		    $tt->process($infile, $vars, $outfile, binmode => ':utf8');
+	    } else {
+	    	my $dirname = dirname($outfile);
+	    	make_path $dirname unless -f $dirname;
+
+	    	copy $infile => $outfile;
+	    }
 	}
 
-	$self->fetch_jquery;
-	$self->fetch_bootstrap;
+	### XXX - Fixme
+	## $self->fetch_jquery;
+	## $self->fetch_bootstrap;
+}
+
+sub create_db_config($self) {
+	$self->log("Creating database configuration file.");
+	my $db;
+	for my $table ($self->{schema}->sources) {
+		my $tbl  = $self->{schema}->source($table);
+		my $cols = $tbl->columns_info;
+
+		for my $key ($tbl->primary_columns) {
+			$cols->{$key}{primary_key} = 1;
+		}
+
+		my $i = 0;
+		for my $col (keys %$cols) {
+			$cols->{$col}{order} = ++$i;
+			$cols->{$col}{widget} = $self->_guess_widget($cols->{$col});
+		}
+
+		$db->{$table} = $cols;
+	}
+
+	my $yaml = YAML::Tiny->new($db);
+	$yaml->write( File::Spec->catfile($self->conf('root'), "database.yml"));
 }
 
 ## Auxiliary metods bellow
+
+sub _table_data($self) {
+	my @tables = $self->{schema}->sources;
+	return [ map { { name => $_ } } @tables ]
+}
+
+sub _guess_widget($self, $column_info) {
+	# XXX - KISS for now
+	my %map = (varchar => 'textfield', integer => 'integer');
+
+	return $map{$column_info->{data_type}} || 'textfield';
+}
 
 sub _find_skel_files($self) {
 	my @files = ();
@@ -183,8 +241,11 @@ sub _init_folder($self) {
 
 sub _download_file($self, $url, $target) {
 	my ($fh, $filename) = tempfile();
-	my $ans = getstore($url, $filename);
-	if (is_success($ans)) {
+
+	$self->{_http_tiny_} ||= HTTP::Tiny->new();
+
+	my $ans = $self->{_http_tiny_}->mirror($url, $filename);
+	if ($ans->{success}) {
 		move $filename, $target;
 		return 1;
 	} else {

@@ -46,10 +46,11 @@ unless (File::Spec->file_name_is_absolute($config{root})) {
 print Dumper(\%config);
 
 my $ballerina = Ballerina->new(%config);
-$ballerina->save();
-$ballerina->compute_dbix_class();
-$ballerina->run_dancer2();
-$ballerina->create_templates();
-$ballerina->connect_dbix();
+$ballerina->compute_dbix_class;
+$ballerina->run_dancer2;
+$ballerina->connect_dbix;
+$ballerina->create_db_config;
+$ballerina->create_templates;
+$ballerina->save;
 
 
