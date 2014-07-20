@@ -1,9 +1,19 @@
 
 <h2><% table.name %></h2>
 
+<form>
+
 <div class="panel panel-default">
   <div class="panel-heading">New Record</div>
 
 
-  <div class="panel-footer">...</div>
+  <div class="panel-footer">
+    <button type="submit" class="btn btn-success btn-small" role="button">
+     <span class="glyphicon glyphicon-ok"></span> Save</button>  
+    <a href="<% request.uri_base %>/<% table.name %>"
+     class="btn btn-default btn-small" role="button">
+     <span class="glyphicon glyphicon-remove"></span> Cancel</a>       
+  </div>
 </div>
+
+</form>

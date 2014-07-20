@@ -4,7 +4,7 @@
 <div class="panel panel-default">
   <div class="panel-heading">
   <a href="<% request.uri_base %>/<% table.name %>/new"
-     class="btn btn-default btn-small" role="button">
+     class="btn btn-primary btn-small" role="button">
      <span class="glyphicon glyphicon-star-empty"></span> New record</a>  
   </div>
 
