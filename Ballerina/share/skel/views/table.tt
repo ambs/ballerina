@@ -1,9 +1,31 @@
 
-
 <h2><% table.name %></h2>
 
-<div>
-  <button type="button" class="btn btn-default btn-sm">
-    <span class="glyphicon glyphicon-star-empty"></span> New record
-  </button>
+<div class="panel panel-default">
+  <div class="panel-heading">
+  <a href="<% request.uri_base %>/<% table.name %>/new"
+     class="btn btn-default btn-small" role="button">
+     <span class="glyphicon glyphicon-star-empty"></span> New record</a>  
+  </div>
+
+  <table class="table table-striped table-hover table-condensed">
+    <thead>
+      <tr>
+        <% FOREACH column IN table.columns %>
+        <th><% column %></th>
+        <% END %>
+    	</tr>
+    </thead>
+    <tbody>
+      <% FOREACH row IN rows %>
+      <tr>
+        <% FOREACH column IN table.columns %>
+        <td><% row.$column %></td>
+        <% END %>
+      </tr>
+      <% END %>
+    </tbody>
+  </table>
+
+  <div class="panel-footer">Something to add later.</div>
 </div>
