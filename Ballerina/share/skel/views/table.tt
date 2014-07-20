@@ -12,7 +12,7 @@
     <thead>
       <tr>
         <% FOREACH column IN table.columns %>
-        <th><% column %></th>
+        <th><% table.coltypes.$column.label %></th>
         <% END %>
     	</tr>
     </thead>

@@ -11,6 +11,9 @@
 	text-align: center;
 }
 
+.small-margin {
+	margin: 10px;
+}
 
 /* Fix issue when content gets behind navbar */
 body {

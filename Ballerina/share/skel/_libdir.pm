@@ -22,6 +22,7 @@ get '/[% table.name %]' => sub {
 	    columns => [ sort {
 	    	$_SCHEMA->{$table}{$a}{order} <=> $_SCHEMA->{$table}{$b}{order}
 	    } keys %{$_SCHEMA->{$table}} ],
+	    coltypes => $_SCHEMA->{$table},
 	};
 
 	template 'table' => {
@@ -37,11 +38,23 @@ get '/[% table.name %]/new' => sub {
 	    columns => [ sort {
 	    	$_SCHEMA->{$table}{$a}{order} <=> $_SCHEMA->{$table}{$b}{order}
 	    } keys %{$_SCHEMA->{$table}} ],
+	    coltypes => $_SCHEMA->{$table},
 	};
 
 	template 'new_record' => {
 		table => $table_info,
 	};
+};
+
+post '/[% table.name %]' => sub {
+	my $action = param('action') || "NOOP";
+
+	if ($action eq "new") {
+
+	}
+	else {
+		forward '/[% table.name %]', { }, { method => 'GET' };
+	}
 };
 [% END %]
 

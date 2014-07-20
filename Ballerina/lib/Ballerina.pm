@@ -9,18 +9,22 @@ use feature 'signatures';
 package Ballerina;
 
 use Carp;
+
 use File::Spec;
 use File::Copy;
-use File::Temp 'tempfile';
 use File::Find;
+use File::Temp 'tempfile';
+use File::Basename 'dirname';
+use File::Path qw(remove_tree make_path);
+
 use IO::Prompt;
 use YAML::Tiny;
-use File::Basename 'dirname';
-use DBIx::Class::Schema::Loader qw/make_schema_at/;
-use File::Path qw(remove_tree make_path);
+
 use Dancer2::CLI::Command::gen 0.143000;
-use HTTP::Tiny;
+use DBIx::Class::Schema::Loader qw/make_schema_at/;
+
 use Template;
+use HTTP::Tiny;
 
 sub new($class, %config) {
 	my $self = bless { conf => \%config }, $class;
@@ -193,8 +197,9 @@ sub create_db_config($self) {
 
 		my $i = 0;
 		for my $col (keys %$cols) {
-			$cols->{$col}{order} = ++$i;
+			$cols->{$col}{order}  = ++$i;
 			$cols->{$col}{widget} = $self->_guess_widget($cols->{$col});
+			$cols->{$col}{label}  = ucfirst $col;
 		}
 
 		$db->{$table} = $cols;
