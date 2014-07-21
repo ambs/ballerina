@@ -196,7 +196,7 @@ sub create_db_config($self) {
 		}
 
 		my $i = 0;
-		for my $col (keys %$cols) {
+		for my $col ($tbl->columns) {
 			$cols->{$col}{order}  = ++$i;
 			$cols->{$col}{widget} = $self->_guess_widget($cols->{$col});
 			$cols->{$col}{label}  = ucfirst $col;
