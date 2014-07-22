@@ -24,6 +24,11 @@
         <% FOREACH column IN table.columns %>
         <td><% row.$column %></td>
         <% END %>
+        <td style="text-align: right">
+            <a href="#" class="btn btn-warning btn-default btn-xs"
+               title="edit" role="button">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;</a>
+            <a href="#" class="btn btn-danger btn-default btn-xs"
+               title="delete" role="button">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;</a></td>
       </tr>
       <% END %>
     </tbody>
