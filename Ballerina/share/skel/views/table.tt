@@ -1,6 +1,8 @@
 
 <h2><% table.name %></h2>
 
+<% INCLUDE messages.tt %>
+
 <div class="panel panel-default">
   <div class="panel-heading">
   <a href="<% request.uri_base %>/<% table.name %>/new"
