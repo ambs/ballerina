@@ -20,17 +20,31 @@ get '/' => sub {
 get '/[% table.name %]' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
-		name    => $table,
-	    columns => [ sort {
+		name     => $table,
+	    columns  => [ sort {
 	    	$_SCHEMA->{$table}{$a}{order} <=> $_SCHEMA->{$table}{$b}{order}
 	    } keys %{$_SCHEMA->{$table}} ],
 	    coltypes => $_SCHEMA->{$table},
+	    key      => [ 
+	     ],
 	};
+
+	my @keys = grep {
+    	exists($_SCHEMA->{$table}{$_}{primary_key})
+	} keys %{$_SCHEMA->{$table}};
+	my $rows = [ schema->resultset($table)->search( undef,
+		   	                                  { rows => 1000 })];
+	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
 
 	template 'table' => {
 		table => $table_info,
-		rows  => [ schema->resultset($table)->search( undef, { rows => 1000 })],
+		rows  => $rows,
+		json  => $json,
 	};
+};
+
+post '/[% table.name %]/edit' => sub {
+	"OK"
 };
 
 get '/[% table.name %]/new' => sub {

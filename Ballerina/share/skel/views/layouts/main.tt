@@ -35,5 +35,7 @@
   <script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.js"></script>
   <!-- include bootstrap jscript -->
   <script type="text/javascript" src="<% request.uri_base %>/javascripts/bootstrap.js"></script>
+  <!-- include our own jscript -->
+  <script type="text/javascript" src="<% request.uri_base %>/javascripts/ballerina.js"></script>
  </body>
 </html>

@@ -3,6 +3,10 @@
 
 <% INCLUDE messages.tt %>
 
+<script type="text/javascript">
+  var records = <% json %>;
+</script>
+
 <div class="panel panel-default">
   <div class="panel-heading">
   <a href="<% request.uri_base %>/<% table.name %>/new"
@@ -19,20 +23,47 @@
     	</tr>
     </thead>
     <tbody>
+      <% i = 0 %>
       <% FOREACH row IN rows %>
       <tr>
         <% FOREACH column IN table.columns %>
-        <td><% row.$column %></td>
+        <td>          
+          <% row.$column %>
+        </td>
         <% END %>
         <td style="text-align: right">
-            <a href="#" class="btn btn-warning btn-default btn-xs"
-               title="edit" role="button">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;</a>
-            <a href="#" class="btn btn-danger btn-default btn-xs"
-               title="delete" role="button">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;</a></td>
+            <button onclick="edit_record('<% table.name %>',<% i %>)" 
+               class="btn btn-warning btn-default btn-xs"
+               title="edit">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;</button>
+            <button onclick="delete_record(<% i %>)" 
+               class="btn btn-danger btn-default btn-xs"
+               title="delete">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;</button></td>
       </tr>
+        <% i=i+1 %>
       <% END %>
     </tbody>
   </table>
 
   <div class="panel-footer">Something to add later.</div>
 </div>
+
+
+<div id="delete-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Delete record from <% table.name %></h4>
+      </div>
+      <div class="modal-body">
+        <p>Do you confirm the following record removal?</p>
+        <div id="delete-modal-record" class="well well-sm"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger">Delete</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
