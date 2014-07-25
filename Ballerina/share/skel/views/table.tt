@@ -1,5 +1,4 @@
-
-<h2><% table.name %></h2>
+<h2 id="title"><% table.name %></h2>
 
 <% INCLUDE messages.tt %>
 
@@ -35,7 +34,7 @@
             <button onclick="edit_record('<% table.name %>',<% i %>)" 
                class="btn btn-warning btn-default btn-xs"
                title="edit">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;</button>
-            <button onclick="delete_record(<% i %>)" 
+            <button onclick="delete_record_modal(<% i %>)" 
                class="btn btn-danger btn-default btn-xs"
                title="delete">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;</button></td>
       </tr>
@@ -61,7 +60,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-danger">Delete</button>
+        <button 
+            onclick="delete_record('<% table.name %>')" 
+            type="button" class="btn btn-danger">Delete</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

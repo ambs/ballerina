@@ -62,6 +62,27 @@ get '/[% table.name %]/new' => sub {
 	};
 };
 
+post '/[% table.name %]/delete' => sub {
+	my $table = "[% table.name %]";
+
+	my $status = "OK";
+	try {
+		schema->resultset($table)->search( { params() } )->delete;
+	}
+	catch {
+		$status = "NOK";
+	};
+	content_type "json";
+	to_json { status => $status };
+};
+
+get '/[% table.name %]/deleted' => sub {
+	my $table = "[% table.name %]";
+	deferred type    => 'success';
+	deferred message => "Record deleted successfully";
+	redirect "/$table";
+};
+
 post '/[% table.name %]' => sub {
 	my $table  = "[% table.name %]";	
 	my $action = param('action') || "NOOP";
