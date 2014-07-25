@@ -3,7 +3,7 @@ function edit_record(table, pos) {
 	var target = table + "/edit";
 	var form = '<form action="' + target + '" method="POST">';
 	$.each( records[pos], function (key, val) {
-		// XXX - FIXME: encode value somehow
+		// FIXME: encode value somehow
 		form += "<input type='hidden' name='input_" + key + "' value='" + val + "'/>";
 	});
 	form += "</form>";

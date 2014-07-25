@@ -88,7 +88,7 @@ post '/[% table.name %]' => sub {
 	my $action = param('action') || "NOOP";
 
 	if ($action eq "new") {		
-		## XXX - For now, not testing if all is filled up
+		## FIXME - For now, not testing if all is filled up
 		
 		my %record = map  { ($_ => param "input_$_" ) }
 					 map  { s/^input_//; $_ }
@@ -98,7 +98,7 @@ post '/[% table.name %]' => sub {
 		schema->resultset($table)->create({%record});
 		deferred type    => 'success';
 		deferred message => "Record added successfully";
-		## XXX - later check if there was an error.
+		## FIXME - later check if there was an error.
 		redirect "/$table";
 	}
 	else {
