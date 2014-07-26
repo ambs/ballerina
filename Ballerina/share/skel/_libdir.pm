@@ -26,7 +26,7 @@ get '/[% table.name %]' => sub {
 	    coltypes => $ballerina->coltypes($table),
 	};
 
-	my @keys = $ballerina->keys;
+	my @keys = $ballerina->keys($table);
 	my $rows = [ schema->resultset($table)->search( undef,
 		   	                                  { rows => 1000 })];
 	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
@@ -82,11 +82,11 @@ post '/[% table.name %]' => sub {
 
 	if ($action eq "new") {		
 		## FIXME - For now, not testing if all is filled up
-		
+
 		my %record = map  { ($_ => param "input_$_" ) }
 					 map  { s/^input_//; $_ }
 					 grep { m!^input_! }
-					 keys params();
+					 keys %{ params() };
 
 		schema->resultset($table)->create({%record});
 		deferred type    => 'success';
