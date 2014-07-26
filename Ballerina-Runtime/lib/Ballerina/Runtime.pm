@@ -24,7 +24,7 @@ sub columns {
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
 	return sort {
-	    $self->{shema}{$table}{columns}{$a}{order}
+	    $self->{schema}{$table}{columns}{$a}{order}
 	    <=>
 	    $self->{schema}{$table}{columns}{$b}{order}
 	} keys %{$self->{schema}{$table}{columns}};
