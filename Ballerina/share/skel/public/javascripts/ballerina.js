@@ -1,4 +1,9 @@
 
+/** ballerina.js **/
+
+/**
+*
+*/
 function edit_record(table, pos) {
 	var target = table + "/edit";
 	var form = '<form action="' + target + '" method="POST">';
@@ -10,6 +15,9 @@ function edit_record(table, pos) {
 	$(form).appendTo('body').submit().remove();
 }
 
+/**
+*
+*/
 function delete_record(table) {
 	var pos = $('#selected_record').val();
 	$.ajax({
@@ -33,6 +41,9 @@ function delete_record(table) {
 	);
 }
 
+/**
+*
+*/
 function delete_record_modal(pos) {
 	var form = '<input id="selected_record" type="hidden" value="'+pos+'"/>';
 	$.each( records[pos], function(key, val) {
@@ -41,8 +52,6 @@ function delete_record_modal(pos) {
 	$('#delete-modal-record').html(form);
 	$('#delete-modal').modal('show');
 }
-
-
 
 /**
 * Creates a bootstrap Alert with class Success
