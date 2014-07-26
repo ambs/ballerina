@@ -2,10 +2,11 @@ package [% appname %];
 use Dancer2;
 use Dancer2::Plugin::DBIC;
 use Dancer2::Plugin::Deferred;
-use YAML::Tiny;
 use Try::Tiny;
 
-our $_SCHEMA = YAML::Tiny->read("database.yml")->[0];
+use Ballerina::Runtime;
+
+my $ballerina = Ballerina::Runtime->new;
 
 hook before_template_render => sub {
     my $tokens = shift;
@@ -21,17 +22,11 @@ get '/[% table.name %]' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
 		name     => $table,
-	    columns  => [ sort {
-	    	$_SCHEMA->{$table}{columns}{$a}{order} <=> $_SCHEMA->{$table}{columns}{$b}{order}
-	    } keys %{$_SCHEMA->{$table}{columns}} ],
-	    coltypes => $_SCHEMA->{$table}{columns},
-	    key      => [ 
-	     ],
+	    columns  => [ $ballerina->columns($table) ],
+	    coltypes => $ballerina->coltypes($table),
 	};
 
-	my @keys = grep {
-    	exists($_SCHEMA->{$table}{columns}{$_}{primary_key})
-	} keys %{$_SCHEMA->{$table}{columns}};
+	my @keys = $ballerina->keys;
 	my $rows = [ schema->resultset($table)->search( undef,
 		   	                                  { rows => 1000 })];
 	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
@@ -51,10 +46,8 @@ get '/[% table.name %]/new' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
 		name    => $table,
-	    columns => [ sort {
-	    	$_SCHEMA->{$table}{columns}{$a}{order} <=> $_SCHEMA->{$table}{columns}{$b}{order}
-	    } keys %{$_SCHEMA->{$table}{columns}} ],
-	    coltypes => $_SCHEMA->{$table}{columns},
+	    columns => [ $ballerina->columns($table) ],
+	    coltypes => $ballerina->coltypes($table),
 	};
 
 	template 'new_record' => {
