@@ -12,7 +12,7 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-          <!-- XXX - class active para o menu selecionado -->
+          <!-- FIXME - class active para o menu selecionado -->
             <li><a href="/">Home</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <span class="caret"></span></a>

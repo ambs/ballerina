@@ -165,7 +165,7 @@ sub create_templates($self) {
 			   };
 
 	for my $infile ($self->_find_skel_files()) {
-		### XXX - Fixme => share/skel replaced by the correct folder name
+		### FIXME => share/skel replaced by the correct folder name
 		my $outfile = $infile =~ s{share/skel}{$self->conf('root')}re;	
 		$outfile =~ s{_libdir}{"lib/" . join("/", split /::/, $self->conf("name"))}e;
 
@@ -179,7 +179,7 @@ sub create_templates($self) {
 	    }
 	}
 
-	### XXX - Fixme
+	### FIXME - uncomment
 	## $self->fetch_jquery;
 	## $self->fetch_bootstrap;
 }
@@ -217,7 +217,7 @@ sub _table_data($self) {
 }
 
 sub _guess_widget($self, $column_info) {
-	# XXX - KISS for now
+	# FIXME - KISS for now
 	my %map = (varchar => 'textfield', integer => 'integer');
 
 	return $map{$column_info->{data_type}} || 'textfield';
@@ -225,7 +225,7 @@ sub _guess_widget($self, $column_info) {
 
 sub _find_skel_files($self) {
 	my @files = ();
-	### XXX - Fixme => share replaced by the correct folder name
+	### FIXME => share replaced by the correct folder name
 	find(sub {-f $_ and push @files, $File::Find::name}, "share");
 	return @files;
 }
