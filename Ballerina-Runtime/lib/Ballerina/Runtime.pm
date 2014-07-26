@@ -12,14 +12,21 @@ sub new {
 	return bless $self, $class;
 }
 
-sub coltypes {
+sub table_coltypes {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
 	return $self->{schema}{$table}{columns}
 }
 
-sub columns {
+sub table_label {
+	my ($self, $table) = @_;
+	die "Unknown table $table" unless exists $self->{schema}{$table};
+
+	return $self->{schema}{$table}{label} || $table;
+}
+
+sub table_columns {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
@@ -30,7 +37,7 @@ sub columns {
 	} keys %{$self->{schema}{$table}{columns}};
 }
 
-sub keys {
+sub table_keys {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 

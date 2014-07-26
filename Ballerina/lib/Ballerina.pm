@@ -209,6 +209,7 @@ sub create_db_config($self) {
 		}
 
 		$db->{$table}{columns} = $cols;
+		$db->{$table}{label}   = $table;
 	}
 
 	my $yaml = YAML::Tiny->new($db);

@@ -22,11 +22,12 @@ get '/[% table.name %]' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
 		name     => $table,
-	    columns  => [ $ballerina->columns($table) ],
-	    coltypes => $ballerina->coltypes($table),
+		label    => $ballerina->table_label($table),
+	    columns  => [ $ballerina->table_columns($table) ],
+	    coltypes => $ballerina->table_coltypes($table),
 	};
 
-	my @keys = $ballerina->keys($table);
+	my @keys = $ballerina->table_keys($table);
 	my $rows = [ schema->resultset($table)->search( undef,
 		   	                                  { rows => 1000 })];
 	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
@@ -46,8 +47,8 @@ get '/[% table.name %]/new' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
 		name    => $table,
-	    columns => [ $ballerina->columns($table) ],
-	    coltypes => $ballerina->coltypes($table),
+	    columns => [ $ballerina->table_columns($table) ],
+	    coltypes => $ballerina->table_coltypes($table),
 	};
 
 	template 'new_record' => {
