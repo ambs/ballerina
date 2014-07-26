@@ -44,18 +44,30 @@ function delete_record_modal(pos) {
 
 
 
+/**
+* Creates a bootstrap Alert with class Success
+*/
 function success_alert(contents) {
 	create_generic_alert('success', contents);
 }
 
+/**
+* Creates a bootstrap Alert with class Danger
+*/
 function error_alert(contents) {
 	create_generic_alert('danger', contents);
 }
 
+/**
+* Creates a bootstrap Alert with class Warning
+*/
 function warning_alert(contents) {
 	create_generic_alert('warning', contents);
 }
 
+/**
+* Creates a generic bootstrap Alert
+*/
 function create_generic_alert(type, contents) {
 	var alert = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">';
 	alert += '<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>';

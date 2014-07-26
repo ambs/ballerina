@@ -22,16 +22,16 @@ get '/[% table.name %]' => sub {
 	my $table_info = {
 		name     => $table,
 	    columns  => [ sort {
-	    	$_SCHEMA->{$table}{$a}{order} <=> $_SCHEMA->{$table}{$b}{order}
-	    } keys %{$_SCHEMA->{$table}} ],
-	    coltypes => $_SCHEMA->{$table},
+	    	$_SCHEMA->{$table}{columns}{$a}{order} <=> $_SCHEMA->{$table}{columns}{$b}{order}
+	    } keys %{$_SCHEMA->{$table}{columns}} ],
+	    coltypes => $_SCHEMA->{$table}{columns},
 	    key      => [ 
 	     ],
 	};
 
 	my @keys = grep {
-    	exists($_SCHEMA->{$table}{$_}{primary_key})
-	} keys %{$_SCHEMA->{$table}};
+    	exists($_SCHEMA->{$table}{columns}{$_}{primary_key})
+	} keys %{$_SCHEMA->{$table}{columns}};
 	my $rows = [ schema->resultset($table)->search( undef,
 		   	                                  { rows => 1000 })];
 	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
@@ -52,9 +52,9 @@ get '/[% table.name %]/new' => sub {
 	my $table_info = {
 		name    => $table,
 	    columns => [ sort {
-	    	$_SCHEMA->{$table}{$a}{order} <=> $_SCHEMA->{$table}{$b}{order}
-	    } keys %{$_SCHEMA->{$table}} ],
-	    coltypes => $_SCHEMA->{$table},
+	    	$_SCHEMA->{$table}{columns}{$a}{order} <=> $_SCHEMA->{$table}{columns}{$b}{order}
+	    } keys %{$_SCHEMA->{$table}{columns}} ],
+	    coltypes => $_SCHEMA->{$table}{columns},
 	};
 
 	template 'new_record' => {

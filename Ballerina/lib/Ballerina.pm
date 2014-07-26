@@ -184,6 +184,12 @@ sub create_templates($self) {
 	## $self->fetch_bootstrap;
 }
 
+=head2 C<create_db_config>
+
+Creates the basic configuration file for Ballerina. It should be edited later
+by the user.
+
+=cut
 sub create_db_config($self) {
 	$self->log("Creating database configuration file.");
 	my $db;
@@ -202,7 +208,7 @@ sub create_db_config($self) {
 			$cols->{$col}{label}  = ucfirst $col;
 		}
 
-		$db->{$table} = $cols;
+		$db->{$table}{columns} = $cols;
 	}
 
 	my $yaml = YAML::Tiny->new($db);

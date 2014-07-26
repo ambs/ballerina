@@ -9,5 +9,9 @@
     error_alert("<% deferred.message %>");
   <% END %>
 
+  <% IF deferred.type == 'warning' %>
+    warning_alert("<% deferred.message %>");
+  <% END %>
+
    });
 </script>
