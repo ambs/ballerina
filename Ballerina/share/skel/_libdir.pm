@@ -43,6 +43,10 @@ post '/[% table.name %]/edit' => sub {
 	"OK"
 };
 
+post '/[% table.name %]/view' => sub {
+	"OK"
+};
+
 get '/[% table.name %]/new' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {

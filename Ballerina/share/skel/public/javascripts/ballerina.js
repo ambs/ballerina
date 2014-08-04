@@ -1,6 +1,21 @@
 
 /** ballerina.js **/
 
+
+/**
+*
+*/
+function view_record(table, pos) {
+	var target = table + "/view";
+	var form = '<form action="' + target + '" method="POST">';
+	$.each( records[pos], function (key, val) {
+		// FIXME: encode value somehow
+		form += "<input type='hidden' name='input_" + key + "' value='" + val + "'/>";
+	});
+	form += "</form>";
+	$(form).appendTo('body').submit().remove();
+}
+
 /**
 *
 */

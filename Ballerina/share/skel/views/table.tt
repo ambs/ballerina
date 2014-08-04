@@ -31,11 +31,14 @@
         </td>
         <% END %>
         <td style="text-align: right">
+            <button onclick="view_record('<% table.name %>',<% i %>)"
+               class="btn btn-success btn-xs"
+               title="view">&nbsp;<span class="glyphicon glyphicon-search"></span>&nbsp;</button>
             <button onclick="edit_record('<% table.name %>',<% i %>)" 
-               class="btn btn-warning btn-default btn-xs"
+               class="btn btn-warning btn-xs"
                title="edit">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;</button>
             <button onclick="delete_record_modal(<% i %>)" 
-               class="btn btn-danger btn-default btn-xs"
+               class="btn btn-danger btn-xs"
                title="delete">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;</button></td>
       </tr>
         <% i=i+1 %>
