@@ -18,6 +18,9 @@ get '/' => sub {
 };
 
 [% FOREACH table IN tables %]
+
+### [% table.name %]
+
 get '/[% table.name %]' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = $ballerina->table_info($table);
