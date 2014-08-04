@@ -4,8 +4,8 @@
 <form method="POST" class="form-horizontal"
       action="<% request.uri_base %>/<% table.name %>">
 
-<% IF type == "new" %>
-   <input type="hidden" name="action" value="new"/>
+<% IF type == "new" || type == "edit" || type == "view" %>
+   <input type="hidden" name="action" value="<% type %>"/>
 <% END %>
 
 <div class="panel panel-default">
