@@ -12,6 +12,17 @@ sub new {
 	return bless $self, $class;
 }
 
+sub table_info {
+	my ($self, $table) = @_;
+	return +{
+		name     => $table,
+		label    => $self->table_label($table),
+	    columns  => $self->table_columns($table),
+	    coltypes => $self->table_coltypes($table),
+	    keys     => $self->table_keys($table),
+	};
+}
+
 sub table_coltypes {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
@@ -30,20 +41,20 @@ sub table_columns {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
-	return sort {
+	return [ sort {
 	    $self->{schema}{$table}{columns}{$a}{order}
 	    <=>
 	    $self->{schema}{$table}{columns}{$b}{order}
-	} keys %{$self->{schema}{$table}{columns}};
+	} keys %{$self->{schema}{$table}{columns}} ];
 }
 
 sub table_keys {
 	my ($self, $table) = @_;
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
-	grep {
+	[ grep {
     	exists($self->{schema}{$table}{columns}{$_}{primary_key})
-	} keys %{$self->{schema}{$table}{columns}};
+	} keys %{$self->{schema}{$table}{columns}} ];
 }
 
 

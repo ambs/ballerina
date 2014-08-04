@@ -20,14 +20,9 @@ get '/' => sub {
 [% FOREACH table IN tables %]
 get '/[% table.name %]' => sub {
 	my $table = "[% table.name %]";
-	my $table_info = {
-		name     => $table,
-		label    => $ballerina->table_label($table),
-	    columns  => [ $ballerina->table_columns($table) ],
-	    coltypes => $ballerina->table_coltypes($table),
-	};
+	my $table_info = $ballerina->table_info($table);
 
-	my @keys = $ballerina->table_keys($table);
+	my @keys = @{ $table_info->{keys} };
 	my $rows = [ schema->resultset($table)->search( undef,
 		   	                                  { rows => 1000 })];
 	my $json = to_json( [ map { my $row = $_; +{ map { ($_ => $row->$_ )} @keys} } @$rows ] );
@@ -40,21 +35,30 @@ get '/[% table.name %]' => sub {
 };
 
 post '/[% table.name %]/edit' => sub {
-	"OK"
+	my $table = "[% table.name %]";
+	my $table_info = $ballerina->table_info($table);
+	my %record_keys = map  { ($_ => param "input_$_" ) }
+					  map  { s/^input_//; $_ }
+					  grep { m!^input_! }
+					  keys %{ params() };
+	my ($row) = schema->resultset($table)->search( \%record_keys );
+	template 'record' => {
+		type  => 'edit',		
+		table => $table_info,
+	};
 };
 
 post '/[% table.name %]/view' => sub {
-	"OK"
+
+	template 'record' => {
+		type => 'view',
+	}
 };
 
 get '/[% table.name %]/new' => sub {
 	my $table = "[% table.name %]";
-	my $table_info = {
-		name     => $table,
-	    columns  => [ $ballerina->table_columns($table) ],
-	    coltypes => $ballerina->table_coltypes($table),
-	};
-
+	## FIXME: make this a method from Runtime
+	my $table_info = $ballerina->table_info($table);
 	template 'record' => {
 		type  => 'new',
 		table => $table_info,
@@ -88,7 +92,7 @@ post '/[% table.name %]' => sub {
 
 	if ($action eq "new") {		
 		## FIXME - For now, not testing if all is filled up
-
+		## Also, generalize this as a Ballerina-> method.
 		my %record = map  { ($_ => param "input_$_" ) }
 					 map  { s/^input_//; $_ }
 					 grep { m!^input_! }

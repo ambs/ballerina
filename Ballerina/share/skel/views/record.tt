@@ -9,7 +9,11 @@
 <% END %>
 
 <div class="panel panel-default">
-  <div class="panel-heading">New Record</div>
+  <div class="panel-heading">
+    <% IF type == "new"  %>New Record <% END %>
+    <% IF type == "edit" %>Edit Record<% END %>
+    <% IF type == "view" %>View Record<% END %>    
+  </div>
 
   <div class="small-margin">
     <% FOREACH column IN table.columns %>
