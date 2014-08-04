@@ -50,12 +50,13 @@ post '/[% table.name %]/view' => sub {
 get '/[% table.name %]/new' => sub {
 	my $table = "[% table.name %]";
 	my $table_info = {
-		name    => $table,
-	    columns => [ $ballerina->table_columns($table) ],
+		name     => $table,
+	    columns  => [ $ballerina->table_columns($table) ],
 	    coltypes => $ballerina->table_coltypes($table),
 	};
 
-	template 'new_record' => {
+	template 'record' => {
+		type  => 'new',
 		table => $table_info,
 	};
 };
@@ -76,7 +77,7 @@ post '/[% table.name %]/delete' => sub {
 
 get '/[% table.name %]/deleted' => sub {
 	my $table = "[% table.name %]";
-	deferred type    => 'success';
+	deferred type    => 'warning';
 	deferred message => "Record deleted successfully";
 	redirect "/$table";
 };
