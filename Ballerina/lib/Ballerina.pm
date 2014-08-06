@@ -198,7 +198,7 @@ sub create_db_config($self) {
 		my $cols = $tbl->columns_info;
 
 		for my $key ($tbl->primary_columns) {
-			$cols->{$key}{primary_key} = 1;
+			$cols->{$key}{is_primary_key} = 1;
 		}
 
 		my $i = 0;

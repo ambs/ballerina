@@ -18,7 +18,13 @@
   <div class="small-margin">
     <% FOREACH column IN table.columns %>
 
-    <% NEXT IF table.coltypes.$column.is_auto_increment %>
+    <% NEXT IF type == "new" && table.coltypes.$column.is_auto_increment %>
+
+    <% IF type == "edit" && table.coltypes.$column.is_primary_key %>
+       <!-- show primary keys but not allow edit (FIXME) -->
+      <% NEXT %>
+    <% END %>
+
 
     <div class="form-group">
       <label for="input_<% column %>" class="col-sm-2 control-label">
