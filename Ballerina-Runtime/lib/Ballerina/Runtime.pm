@@ -53,7 +53,7 @@ sub table_keys {
 	die "Unknown table $table" unless exists $self->{schema}{$table};
 
 	[ grep {
-    	exists($self->{schema}{$table}{columns}{$_}{primary_key})
+    	exists($self->{schema}{$table}{columns}{$_}{is_primary_key})
 	} keys %{$self->{schema}{$table}{columns}} ];
 }
 
