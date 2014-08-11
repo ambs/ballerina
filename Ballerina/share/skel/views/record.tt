@@ -12,19 +12,26 @@
   <div class="panel-heading">
     <% IF type == "new"  %>New Record <% END %>
     <% IF type == "edit" %>Edit Record<% END %>
-    <% IF type == "view" %>View Record<% END %>    
+    <% IF type == "view" %>View Record<% END %>
+
+    <% IF type == "view" || type == "edit" %>
+      <div class="pull-right">
+          <% IF type == "view" %>
+            <button onclick="edit_record('<% table.name %>',<% i %>)" 
+               class="btn btn-warning btn-xs"
+               title="edit">&nbsp;<span class="glyphicon glyphicon-pencil"></span>&nbsp;Edit&nbsp;</button>
+          <% END %>
+            <button onclick="delete_record_modal(<% i %>)" 
+               class="btn btn-danger btn-xs"
+               title="delete">&nbsp;<span class="glyphicon glyphicon-trash"></span>&nbsp;Delete&nbsp;</button>
+      </div>
+     <% END %> 
   </div>
 
   <div class="small-margin">
     <% FOREACH column IN table.columns %>
 
     <% NEXT IF type == "new" && table.coltypes.$column.is_auto_increment %>
-
-    <% IF type == "edit" && table.coltypes.$column.is_primary_key %>
-       <!-- show primary keys but not allow edit (FIXME) -->
-      <% NEXT %>
-    <% END %>
-
 
     <div class="form-group">
       <label for="input_<% column %>" class="col-sm-2 control-label">
@@ -33,6 +40,12 @@
       <div class="col-sm-10">
         <input class="form-control" id="input_<% column %>" 
                name="input_<% column %>" 
+         <% IF type == "view" || type == "edit" %>
+               value=<% row.$column %>
+         <% END %>
+         <% IF type == "view" ||
+               (type == "edit" && table.coltypes.$column.is_primary_key) %>
+               readonly="readonly" <% END %>
                placeholder="<% table.coltypes.$column.label %>"/>
       </div>
     </div>
@@ -40,11 +53,18 @@
   </div>
 
   <div class="panel-footer">
-    <button type="submit" class="btn btn-success btn-small" role="button">
-     <span class="glyphicon glyphicon-ok"></span> Save</button>  
-    <a href="<% request.uri_base %>/<% table.name %>"
-     class="btn btn-default btn-small" role="button">
-     <span class="glyphicon glyphicon-remove"></span> Cancel</a>       
+    <% IF type=="new" || type=="edit" %>
+      <button type="submit" class="btn btn-success btn-small" role="button">
+       <span class="glyphicon glyphicon-ok"></span> Save</button>  
+      <a href="<% request.uri_base %>/<% table.name %>"
+       class="btn btn-default btn-small" role="button">
+       <span class="glyphicon glyphicon-remove"></span> Cancel</a>       
+    <% END %>
+    <% IF type=="view" %>
+      <a href="<% request.uri_base %>/<% table.name %>"
+       class="btn btn-default btn-small" role="button">
+       <span class="glyphicon glyphicon-chevron-left"></span> Back</a>       
+    <% END %>
   </div>
 </div>
 

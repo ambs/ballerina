@@ -37,7 +37,8 @@ get '/[% table.name %]' => sub {
 	};
 };
 
-post '/[% table.name %]/edit' => sub {
+post qr{/[% table.name %]/(view|edit)} => sub {
+	my ($action) = splat;
 	my $table = "[% table.name %]";
 	my $table_info = $ballerina->table_info($table);
 	my %record_keys = map  { ($_ => param "input_$_" ) }
@@ -46,16 +47,10 @@ post '/[% table.name %]/edit' => sub {
 					  keys %{ params() };
 	my ($row) = schema->resultset($table)->search( \%record_keys );
 	template 'record' => {
-		type  => 'edit',		
 		table => $table_info,
+		type  => $action,
+		row   => $row,
 	};
-};
-
-post '/[% table.name %]/view' => sub {
-
-	template 'record' => {
-		type => 'view',
-	}
 };
 
 get '/[% table.name %]/new' => sub {
