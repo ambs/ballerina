@@ -32,6 +32,7 @@ plugins:
       schema_class: [% appname %]::Schema
       dsn: [% dsn %]
       options:
+        mysql_enable_utf8: 1
         RaiseError: 1
         PrintError: 1
 [% IF db_user %]      user: [% db_user %][% END %]
