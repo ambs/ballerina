@@ -21,9 +21,17 @@ function view_record(table, pos) {
 */
 function edit_record(table, pos) {
 	var target = table + "/edit";
-	var form = '<form action="' + target + '" method="POST">';
-	$.each( records[pos], function (key, val) {
-		// FIXME: encode value somehow
+	post_request(target, records[pos]);
+}
+
+/** 
+* Creates form on the fly, submits it
+* keys are prepended an 'input_' prefix (for now)
+*/
+function post_request(url, data) {
+	var form = '<form action="' + url + '" method="POST">';
+	$.each( data, function (key, val) {
+		// FIXME: encode values somehow
 		form += "<input type='hidden' name='input_" + key + "' value='" + val + "'/>";
 	});
 	form += "</form>";
