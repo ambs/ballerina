@@ -41,7 +41,7 @@
         <input class="form-control" id="input_<% column %>" 
                name="input_<% column %>" 
          <% IF type == "view" || type == "edit" %>
-               value=<% row.$column %>
+               value="<% row.$column %>"
          <% END %>
          <% IF type == "view" ||
                (type == "edit" && table.coltypes.$column.is_primary_key) %>

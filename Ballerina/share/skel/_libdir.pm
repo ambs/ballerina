@@ -96,9 +96,24 @@ post '/[% table.name %]' => sub {
 					 grep { m!^input_! }
 					 keys %{ params() };
 
-		schema->resultset($table)->create({%record});
-		deferred type    => 'success';
+		schema->resultset($table)->create(\%record);
+		deferred type    => "success";
 		deferred message => "Record added successfully";
+		## FIXME - later check if there was an error.
+		redirect "/$table";
+	}
+	elsif ($action eq "edit") {
+		## FIXME - For now, not testing if all is filled up
+		## Also, generalize this as a Ballerina-> method.
+
+		my %record = map  { ($_ => param "input_$_" ) }
+					 map  { s/^input_//; $_ }
+					 grep { m!^input_! }
+					 keys %{ params() };
+
+		schema->resultset($table)->update_or_create(\%record);
+		deferred type    => "success";
+		deferred message => "Record updated successfully";
 		## FIXME - later check if there was an error.
 		redirect "/$table";
 	}
